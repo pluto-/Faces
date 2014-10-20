@@ -7,6 +7,7 @@ public class Faces {
     private static final double MOUTH_LEARN_RATE = 0.1;
     private static final double EYEBROW_THRESHOLD = 0.5;
     private static final double MOUTH_THRESHOLD = 0.5;
+    private static final double PERCENT_LIMIT = 0.99;
 
     public static void main(String[] args) {
 
@@ -24,6 +25,7 @@ public class Faces {
             testFaces = FacesLoader.loadFaces(args[2]);
         } catch (IOException e) {
             System.out.println("Could not load files. ERROR: " + e.getMessage());
+            System.exit(1);
         }
 
         Perceptron eyebrowPerceptron = new Perceptron(20, 20, EYEBROW_LEARN_RATE, EYEBROW_THRESHOLD);
@@ -31,10 +33,8 @@ public class Faces {
         Map<Integer, Integer> eyebrowAnswers = new HashMap<>();
         Map<Integer, Integer> mouthAnswers = new HashMap<>();
 
-        Iterator<Integer> keys = trainingAnswers.keySet().iterator();
-        int key;
-        while(keys.hasNext()) {
-            key = keys.next();
+        for(Integer key: trainingAnswers.keySet()) {
+
             eyebrowAnswers.put(key, (trainingAnswers.get(key) - 1) / 2);
             mouthAnswers.put(key, (trainingAnswers.get(key) - 1) % 2);
         }
@@ -53,7 +53,7 @@ public class Faces {
 
     private static double train(Perceptron perceptron, ArrayList<Face> trainingFaces, Map<Integer, Integer> trainingAnswers) {
         double percent = 0;
-        while(percent < 0.99) {
+        while(percent < PERCENT_LIMIT) {
             ArrayList<Face> trainingFacesTemp = new ArrayList<>(trainingFaces);
             Collections.shuffle(trainingFacesTemp);
             ArrayList<Face> trainingTestFaces = new ArrayList<>();
@@ -72,7 +72,6 @@ public class Faces {
                 }
             }
             percent = (double)numberOfCorrectAnswers / (double)trainingTestFaces.size();
-            //System.out.println("percentage : " + percent);
         }
         return percent;
     }

@@ -13,25 +13,24 @@ public class FacesLoader {
     public static ArrayList<Face> loadFaces(String facesPath) throws IOException {
         ArrayList<Face> faces = new ArrayList<>();
 
-        BufferedReader facesBufferedReader = new BufferedReader(new FileReader(facesPath));
-        try {
+        try (BufferedReader facesBufferedReader = new BufferedReader(new FileReader(facesPath))) {
             String line = facesBufferedReader.readLine();
 
             while (line != null) {
-                if(line.length() > "Image".length() && line.substring(0, "Image".length()).equals("Image")) {
+                if (line.length() > "Image".length() && line.substring(0, "Image".length()).equals("Image")) {
                     int imageNr = Integer.valueOf(line.substring("Image".length()));
                     double[][] image = new double[20][20];
-                    for(int i = 0; i < 20; i++) {
+                    for (int i = 0; i < 20; i++) {
                         line = facesBufferedReader.readLine();
 
-                        for(int j = 0; j < 20; j++) {
-                            if(line.indexOf(' ') == -1) {
+                        for (int j = 0; j < 20; j++) {
+                            if (line.indexOf(' ') == -1) {
                                 image[i][j] = Double.valueOf(line) / 32;
                             } else {
                                 image[i][j] = Double.valueOf(line.substring(0, line.indexOf(' '))) / 32;
 
                             }
-                            if(line.indexOf(' ') != -1) {
+                            if (line.indexOf(' ') != -1) {
                                 line = line.substring(line.indexOf(' ') + 1);
                             }
                         }
@@ -40,8 +39,6 @@ public class FacesLoader {
                 }
                 line = facesBufferedReader.readLine();
             }
-        } finally {
-            facesBufferedReader.close();
         }
 
         return faces;
@@ -50,12 +47,11 @@ public class FacesLoader {
     public static Map<Integer, Integer> loadAnswers(String answersPath) throws IOException {
         Map<Integer, Integer> answers = new HashMap<>();
 
-        BufferedReader answersBufferedReader = new BufferedReader(new FileReader(answersPath));
-        try {
+        try (BufferedReader answersBufferedReader = new BufferedReader(new FileReader(answersPath))) {
             String line = answersBufferedReader.readLine();
 
             while (line != null) {
-                if(line.length() > "Image".length() && line.substring(0, "Image".length()).equals("Image")) {
+                if (line.length() > "Image".length() && line.substring(0, "Image".length()).equals("Image")) {
                     int imageNr = Integer.valueOf(line.substring("Image".length(), line.indexOf(' ')));
                     line = line.substring(line.indexOf(' ') + 1);
                     int answer = Integer.valueOf(line);
@@ -63,8 +59,6 @@ public class FacesLoader {
                 }
                 line = answersBufferedReader.readLine();
             }
-        } finally {
-            answersBufferedReader.close();
         }
         return answers;
     }

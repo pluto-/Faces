@@ -3,8 +3,8 @@
  */
 public class Face implements Cloneable {
 
-    private double[][] image;
-    private int imageNr;
+    private final double[][] image;
+    private final int imageNr;
 
     public Face(double[][] image, int imageNr) {
         this.image = image;

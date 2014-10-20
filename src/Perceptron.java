@@ -3,9 +3,9 @@
  */
 public class Perceptron {
 
-    private double[][] weights;
-    private double learningRate;
-    private double threshold;
+    private final double[][] weights;
+    private final double learningRate;
+    private final double threshold;
 
     public Perceptron(int rows, int columns, double learningRate, double threshold) {
         weights = new double[rows][columns];
