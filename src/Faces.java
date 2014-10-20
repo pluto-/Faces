@@ -5,10 +5,12 @@ import java.util.*;
 
 public class Faces {
 
-    public static final double EYEBROW_LEARN_RATE = 0.1;
-    public static final double MOUTH_LEARN_RATE = 0.1;
-    public static final double EYEBROW_THRESHOLD = 0.5;
-    public static final double MOUTH_THRESHOLD = 0.5;
+    private static final double EYEBROW_LEARN_RATE = 0.1;
+    private static final double MOUTH_LEARN_RATE = 0.1;
+    private static final double EYEBROW_THRESHOLD = 0.5;
+    private static final double MOUTH_THRESHOLD = 0.5;
+
+    private static final double PERCENT_LIMIT = 0.99;
 
     public static void main(String[] args) {
 
@@ -55,7 +57,7 @@ public class Faces {
 
     private static double train(Perceptron perceptron, ArrayList<Face> trainingFaces, Map<Integer, Integer> trainingAnswers) {
         double percent = 0;
-        while(percent < 0.99) {
+        while(percent < PERCENT_LIMIT) {
             ArrayList<Face> trainingFacesTemp = (ArrayList<Face>)trainingFaces.clone();
             Collections.shuffle(trainingFacesTemp);
             ArrayList<Face> trainingTestFaces = new ArrayList<Face>();
@@ -74,7 +76,6 @@ public class Faces {
                 }
             }
             percent = (double)numberOfCorrectAnswers / (double)trainingTestFaces.size();
-            //System.out.println("percentage : " + percent);
         }
         return percent;
     }
