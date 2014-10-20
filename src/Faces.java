@@ -48,8 +48,16 @@ public class Faces {
                 mouthAnswers.put(key, SHAPE_MOUNTAIN);
             }
         }
-        Perceptron eyebrowPerceptron = getBestPerceptron(trainingFaces, eyebrowAnswers);
-        Perceptron mouthPerceptron = getBestPerceptron(trainingFaces, mouthAnswers);
+
+        ArrayList<Face> trainingTestFaces = new ArrayList<Face>();
+        int size = (int)(trainingFaces.size() * 0.33);
+        for(int i = 0; i < size; i++) {
+            trainingTestFaces.add(trainingFaces.get(i));
+            //trainingFaces.remove(0);
+        }
+
+        Perceptron eyebrowPerceptron = getBestPerceptron(trainingFaces, trainingTestFaces, eyebrowAnswers);
+        Perceptron mouthPerceptron = getBestPerceptron(trainingFaces, trainingTestFaces, mouthAnswers);
 
         for(Face face : testFaces) {
             int eyebrowAnswer = eyebrowPerceptron.answer(face.getImage());
@@ -67,16 +75,9 @@ public class Faces {
 
     }
 
-    private static Perceptron getBestPerceptron(ArrayList<Face> trainingFaces, Map<Integer, Integer> trainingAnswers) {
+    private static Perceptron getBestPerceptron(ArrayList<Face> trainingFaces, ArrayList<Face> trainingTestFaces, Map<Integer, Integer> trainingAnswers) {
 
         Perceptron candidate = null;
-
-        List<Face> trainingTestFaces = new ArrayList<Face>();
-        int size = (int)(trainingFaces.size() * 0.33);
-        for(int i = 0; i < size; i++) {
-            trainingTestFaces.add(trainingFaces.get(0));
-            trainingFaces.remove(0);
-        }
 
         double bestPercent = 0.0;
         int best_i = 0,best_j = 0;
@@ -114,9 +115,9 @@ public class Faces {
             }
         }
 
-        System.out.println("BEST PERCENT = " + bestPercent);
+        /*System.out.println("BEST PERCENT = " + bestPercent);
         System.out.println("BEST LEARNING RATE = " + (0.1+(double)best_i/(double)10));
-        System.out.println("BEST THRESHOLD = " + ((double)best_j/(double)10));
+        System.out.println("BEST THRESHOLD = " + ((double)best_j/(double)10));*/
         return bestPerceptron;
     }
 }
