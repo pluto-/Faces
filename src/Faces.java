@@ -49,7 +49,7 @@ public class Faces {
             }
         }
 
-        ArrayList<Face> trainingTestFaces = new ArrayList<Face>();
+        /*ArrayList<Face> trainingTestFaces = new ArrayList<Face>();
         int size = (int)(trainingFaces.size() * 0.33);
         for(int i = 0; i < size; i++) {
             trainingTestFaces.add(trainingFaces.get(i));
@@ -57,7 +57,17 @@ public class Faces {
         }
 
         Perceptron eyebrowPerceptron = getBestPerceptron(trainingFaces, trainingTestFaces, eyebrowAnswers);
-        Perceptron mouthPerceptron = getBestPerceptron(trainingFaces, trainingTestFaces, mouthAnswers);
+        Perceptron mouthPerceptron = getBestPerceptron(trainingFaces, trainingTestFaces, mouthAnswers);*/
+
+        Perceptron eyebrowPerceptron = new Perceptron(20, 20, 0.001, 0.5);
+        Perceptron mouthPerceptron = new Perceptron(20, 20, 0.001, 0.5);
+
+        for(int i = 0; i < 1000; i++) {
+            train(eyebrowPerceptron, trainingFaces, eyebrowAnswers);
+        }
+        for(int i = 0; i < 1000; i++) {
+            train(mouthPerceptron, trainingFaces, mouthAnswers);
+        }
 
         for(Face face : testFaces) {
             int eyebrowAnswer = eyebrowPerceptron.answer(face.getImage());
@@ -73,6 +83,21 @@ public class Faces {
             }
         }
 
+    }
+
+    private static void train(Perceptron perceptron, ArrayList<Face> trainingFaces_in, Map<Integer, Integer> trainingAnswers) {
+        ArrayList<Face> trainingFaces = (ArrayList<Face>)trainingFaces_in.clone();
+        Collections.shuffle(trainingFaces);
+
+        /*ArrayList<Face> trainingTestFaces = new ArrayList<Face>();
+        int size = (int)(trainingFaces.size() * 0.33);
+        for(int i = 0; i < size; i++) {
+            trainingTestFaces.add(trainingFaces.get(i));
+        }*/
+
+        for(Face face : trainingFaces) {
+            perceptron.learn(face.getImage(), trainingAnswers.get(face.getImageNr()).byteValue());
+        }
     }
 
     private static Perceptron getBestPerceptron(ArrayList<Face> trainingFaces, ArrayList<Face> trainingTestFaces, Map<Integer, Integer> trainingAnswers) {
