@@ -29,137 +29,35 @@ public class Faces {
             System.out.println("Could not load files. ERROR: " + e.getMessage());
         }
 
-        Map<Integer, Integer> eyebrowAnswers = new HashMap<Integer, Integer>();
-        Map<Integer, Integer> mouthAnswers = new HashMap<Integer, Integer>();
-        Iterator<Integer> keys = trainingAnswers.keySet().iterator();
-        while(keys.hasNext()) {
-            int key = keys.next();
-            if(trainingAnswers.get(key) == ANSWER_HAPPY) {
-                eyebrowAnswers.put(key, SHAPE_MOUNTAIN);
-                mouthAnswers.put(key, SHAPE_VALLEY);
-            } else if(trainingAnswers.get(key) == ANSWER_SAD) {
-                eyebrowAnswers.put(key, SHAPE_MOUNTAIN);
-                mouthAnswers.put(key, SHAPE_MOUNTAIN);
-            } else if(trainingAnswers.get(key) == ANSWER_MISCHIEVOUS) {
-                eyebrowAnswers.put(key, SHAPE_VALLEY);
-                mouthAnswers.put(key, SHAPE_VALLEY);
-            } else if(trainingAnswers.get(key) == ANSWER_MAD) {
-                eyebrowAnswers.put(key, SHAPE_VALLEY);
-                mouthAnswers.put(key, SHAPE_MOUNTAIN);
+        Perceptron eyebrowPerceptron = new Perceptron(20, 20, 0.1, 0.9);
+        Perceptron mouthPerceptron = new Perceptron(20, 20, 0.1, 0.7);
+
+        double percent = 0;
+
+        while(percent < 0.99) {
+            Collections.shuffle(trainingFaces, new Random(System.nanoTime()));
+            int numberOfCorrectAnswers = 0;
+            for (Face face : trainingFaces) {
+                int correctAnswer = trainingAnswers.get(face.getImageNr());
+                double[][] image = face.getImage();
+                eyebrowPerceptron.learn(image, (correctAnswer - 1) / 2);
+                mouthPerceptron.learn(image, (correctAnswer - 1) % 2);
+                if (getFacialExpression(eyebrowPerceptron.answer(image), mouthPerceptron.answer(image)) == trainingAnswers.get(face.getImageNr())) {
+                    numberOfCorrectAnswers++;
+                }
             }
+            percent = (double)numberOfCorrectAnswers / (double)trainingFaces.size();
+            System.out.println("percentage : " + percent);
         }
-
-        /*ArrayList<Face> trainingTestFaces = new ArrayList<Face>();
-        int size = (int)(trainingFaces.size() * 0.33);
-        for(int i = 0; i < size; i++) {
-            trainingTestFaces.add(trainingFaces.get(i));
-            //trainingFaces.remove(0);
-        }
-
-        Perceptron eyebrowPerceptron = getBestPerceptron(trainingFaces, trainingTestFaces, eyebrowAnswers);
-        Perceptron mouthPerceptron = getBestPerceptron(trainingFaces, trainingTestFaces, mouthAnswers);*/
-
-        Perceptron eyebrowPerceptron = new Perceptron(20, 20, 0.1, 0.5);
-        Perceptron mouthPerceptron = new Perceptron(20, 20, 0.1, 0.5);
-
-        train(eyebrowPerceptron, trainingFaces, eyebrowAnswers);
-        train(mouthPerceptron, trainingFaces, mouthAnswers);
-
 
         for(Face face : testFaces) {
             int eyebrowAnswer = eyebrowPerceptron.answer(face.getImage());
             int mouthAnswer = mouthPerceptron.answer(face.getImage());
-
-            if(eyebrowAnswer == SHAPE_MOUNTAIN && mouthAnswer == SHAPE_VALLEY) {
-                System.out.println("Image" + face.getImageNr() + " " + ANSWER_HAPPY);
-            } else if(eyebrowAnswer == SHAPE_MOUNTAIN && mouthAnswer == SHAPE_MOUNTAIN) {
-                System.out.println("Image" + face.getImageNr() + " " + ANSWER_SAD);
-            } else if(eyebrowAnswer == SHAPE_VALLEY && mouthAnswer == SHAPE_VALLEY) {
-                System.out.println("Image" + face.getImageNr() + " " + ANSWER_MISCHIEVOUS);
-            } else if(eyebrowAnswer == SHAPE_VALLEY && mouthAnswer == SHAPE_MOUNTAIN) {
-                System.out.println("Image" + face.getImageNr() + " " + ANSWER_MAD);
-            }
-            //System.out.println("EYEBROW: " + eyebrowAnswer);
-            //System.out.println("MOUTH: " + eyebrowAnswer);
+            System.out.println("Image" + face.getImageNr() + " " + getFacialExpression(eyebrowPerceptron.answer(face.getImage()), mouthPerceptron.answer(face.getImage())));
         }
-
     }
 
-    private static void train(Perceptron perceptron, ArrayList<Face> trainingFaces_in, Map<Integer, Integer> trainingAnswers) {
-        double correctPercent = 0;
-        while(correctPercent < 0.99) {
-            ArrayList<Face> trainingFaces = (ArrayList<Face>)trainingFaces_in.clone();
-            ArrayList<Face> trainingTestFaces = new ArrayList<Face>();
-            Collections.shuffle(trainingFaces);
-            int size = (int)((double)trainingFaces.size()/3);
-            for(int i = 0; i < size; i++) {
-                trainingTestFaces.add(trainingFaces.get(0));
-                trainingFaces.remove(0);
-            }
-
-            for(Face face : trainingFaces) {
-                perceptron.learn(face.getImage(), trainingAnswers.get(face.getImageNr()).byteValue());
-            }
-
-            int correctAnswers = 0;
-            int wrongAnswers = 0;
-            for(Face face : trainingTestFaces) {
-                int answer = perceptron.answer(face.getImage());
-                if(answer == trainingAnswers.get(face.getImageNr())) {
-                    correctAnswers++;
-                } else {
-                    wrongAnswers++;
-                }
-            }
-            correctPercent = (double)correctAnswers / (double)(correctAnswers + wrongAnswers);
-            System.out.println("Percent" + correctPercent);
-        }
-
-    }
-
-    private static Perceptron getBestPerceptron(ArrayList<Face> trainingFaces, ArrayList<Face> trainingTestFaces, Map<Integer, Integer> trainingAnswers) {
-
-        Perceptron candidate = null;
-
-        double bestPercent = 0.0;
-        int best_i = 0,best_j = 0;
-        Perceptron bestPerceptron = null;
-
-        for(int i = 0; i < 10; i++) {
-            for(int j = 0; j < 30; j++) {
-
-                candidate = new Perceptron(20, 20, 0.1 + ((double)i / (double)10), ((double)j / (double)10));
-
-                for(Face face : trainingFaces) {
-                    candidate.learn(face.getImage(), trainingAnswers.get(face.getImageNr()).byteValue());
-                }
-
-                int correctAnswers = 0;
-                int wrongAnswers = 0;
-
-                for(Face face : trainingTestFaces) {
-                    int answer = candidate.answer(face.getImage());
-
-                    if(trainingAnswers.get(face.getImageNr()) == answer) {
-                        correctAnswers++;
-                    } else {
-                        wrongAnswers++;
-                    }
-                }
-
-                if(((double)correctAnswers / (double)(correctAnswers+wrongAnswers)) > bestPercent) {
-                    bestPercent = ((double)correctAnswers / (double)(correctAnswers+wrongAnswers));
-                    best_i = i;
-                    best_j = j;
-                    bestPerceptron = candidate;
-                }
-
-            }
-        }
-
-        /*System.out.println("BEST PERCENT = " + bestPercent);
-        System.out.println("BEST LEARNING RATE = " + (0.1+(double)best_i/(double)10));
-        System.out.println("BEST THRESHOLD = " + ((double)best_j/(double)10));*/
-        return bestPerceptron;
+    private static int getFacialExpression(int eyebrowExpression, int mouthExpression) {
+        return 1 + eyebrowExpression * 2 + mouthExpression;
     }
 }
