@@ -11,7 +11,7 @@ import java.util.Map;
 public class FacesLoader {
 
     public static ArrayList<Face> loadFaces(String facesPath) throws IOException {
-        ArrayList<Face> faces = new ArrayList<Face>();
+        ArrayList<Face> faces = new ArrayList<>();
 
         BufferedReader facesBufferedReader = new BufferedReader(new FileReader(facesPath));
         try {
@@ -48,7 +48,7 @@ public class FacesLoader {
     }
 
     public static Map<Integer, Integer> loadAnswers(String answersPath) throws IOException {
-        Map<Integer, Integer> answers = new HashMap<Integer, Integer>();
+        Map<Integer, Integer> answers = new HashMap<>();
 
         BufferedReader answersBufferedReader = new BufferedReader(new FileReader(answersPath));
         try {

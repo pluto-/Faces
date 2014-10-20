@@ -1,14 +1,12 @@
-import com.sun.org.apache.bcel.internal.generic.NEW;
-
 import java.io.IOException;
 import java.util.*;
 
 public class Faces {
 
-    public static final double EYEBROW_LEARN_RATE = 0.1;
-    public static final double MOUTH_LEARN_RATE = 0.1;
-    public static final double EYEBROW_THRESHOLD = 0.5;
-    public static final double MOUTH_THRESHOLD = 0.5;
+    private static final double EYEBROW_LEARN_RATE = 0.1;
+    private static final double MOUTH_LEARN_RATE = 0.1;
+    private static final double EYEBROW_THRESHOLD = 0.5;
+    private static final double MOUTH_THRESHOLD = 0.5;
 
     public static void main(String[] args) {
 
@@ -30,8 +28,8 @@ public class Faces {
 
         Perceptron eyebrowPerceptron = new Perceptron(20, 20, EYEBROW_LEARN_RATE, EYEBROW_THRESHOLD);
         Perceptron mouthPerceptron = new Perceptron(20, 20, MOUTH_LEARN_RATE, MOUTH_THRESHOLD);
-        Map<Integer, Integer> eyebrowAnswers = new HashMap<Integer, Integer>();
-        Map<Integer, Integer> mouthAnswers = new HashMap<Integer, Integer>();
+        Map<Integer, Integer> eyebrowAnswers = new HashMap<>();
+        Map<Integer, Integer> mouthAnswers = new HashMap<>();
 
         Iterator<Integer> keys = trainingAnswers.keySet().iterator();
         int key;
@@ -56,9 +54,9 @@ public class Faces {
     private static double train(Perceptron perceptron, ArrayList<Face> trainingFaces, Map<Integer, Integer> trainingAnswers) {
         double percent = 0;
         while(percent < 0.99) {
-            ArrayList<Face> trainingFacesTemp = (ArrayList<Face>)trainingFaces.clone();
+            ArrayList<Face> trainingFacesTemp = new ArrayList<>(trainingFaces);
             Collections.shuffle(trainingFacesTemp);
-            ArrayList<Face> trainingTestFaces = new ArrayList<Face>();
+            ArrayList<Face> trainingTestFaces = new ArrayList<>();
             int size = (int)((double)trainingFacesTemp.size()/3);
             for(int i = 0; i < size; i++) {
                 trainingTestFaces.add(trainingFacesTemp.get(0));

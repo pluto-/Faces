@@ -18,12 +18,6 @@ public class Face implements Cloneable {
     public int getImageNr() {
         return imageNr;
     }
-
-    @Override
-    public Face clone() {
-        return new Face(image.clone(), imageNr);
-    }
-
     public String toString() {
         String str = "";
         for(int i = 0; i < 20; i++) {
