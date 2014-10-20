@@ -5,13 +5,10 @@ import java.util.*;
 
 public class Faces {
 
-    public static final int SHAPE_VALLEY = 0;
-    public static final int SHAPE_MOUNTAIN = 1;
-
-    public static final int ANSWER_HAPPY = 1;
-    public static final int ANSWER_SAD = 2;
-    public static final int ANSWER_MISCHIEVOUS = 3;
-    public static final int ANSWER_MAD = 4;
+    public static final double EYEBROW_LEARN_RATE = 0.1;
+    public static final double MOUTH_LEARN_RATE = 0.1;
+    public static final double EYEBROW_THRESHOLD = 0.5;
+    public static final double MOUTH_THRESHOLD = 0.5;
 
     public static void main(String[] args) {
 
@@ -31,11 +28,32 @@ public class Faces {
             System.out.println("Could not load files. ERROR: " + e.getMessage());
         }
 
-        Perceptron eyebrowPerceptron = new Perceptron(20, 20, 0.1, 0.5);
-        Perceptron mouthPerceptron = new Perceptron(20, 20, 0.1, 0.5);
+        Perceptron eyebrowPerceptron = new Perceptron(20, 20, EYEBROW_LEARN_RATE, EYEBROW_THRESHOLD);
+        Perceptron mouthPerceptron = new Perceptron(20, 20, MOUTH_LEARN_RATE, MOUTH_THRESHOLD);
+        Map<Integer, Integer> eyebrowAnswers = new HashMap<Integer, Integer>();
+        Map<Integer, Integer> mouthAnswers = new HashMap<Integer, Integer>();
 
+        Iterator<Integer> keys = trainingAnswers.keySet().iterator();
+        int key;
+        while(keys.hasNext()) {
+            key = keys.next();
+            eyebrowAnswers.put(key, (trainingAnswers.get(key) - 1) / 2);
+            mouthAnswers.put(key, (trainingAnswers.get(key) - 1) % 2);
+        }
 
+        train(eyebrowPerceptron, trainingFaces, eyebrowAnswers);
+        train(mouthPerceptron, trainingFaces, mouthAnswers);
 
+        for(Face face : testFaces) {
+            System.out.println("Image" + face.getImageNr() + " " + getFacialExpression(eyebrowPerceptron.answer(face.getImage()), mouthPerceptron.answer(face.getImage())));
+        }
+    }
+
+    private static int getFacialExpression(int eyebrowExpression, int mouthExpression) {
+        return 1 + eyebrowExpression * 2 + mouthExpression;
+    }
+
+    private static double train(Perceptron perceptron, ArrayList<Face> trainingFaces, Map<Integer, Integer> trainingAnswers) {
         double percent = 0;
         while(percent < 0.99) {
             ArrayList<Face> trainingFacesTemp = (ArrayList<Face>)trainingFaces.clone();
@@ -47,50 +65,17 @@ public class Faces {
                 trainingFacesTemp.remove(0);
             }
             for (Face face : trainingFacesTemp) {
-                int correctAnswer = trainingAnswers.get(face.getImageNr());
-                eyebrowPerceptron.learn(face.getImage(), (correctAnswer - 1) / 2);
+                perceptron.learn(face.getImage(), trainingAnswers.get(face.getImageNr()));
             }
             int numberOfCorrectAnswers = 0;
             for(Face face : trainingTestFaces) {
-                int correctAnswer = trainingAnswers.get(face.getImageNr());
-                if (eyebrowPerceptron.answer(face.getImage()) == ((correctAnswer - 1) / 2)) {
+                if (perceptron.answer(face.getImage()) == trainingAnswers.get(face.getImageNr())) {
                     numberOfCorrectAnswers++;
                 }
             }
             percent = (double)numberOfCorrectAnswers / (double)trainingTestFaces.size();
             //System.out.println("percentage : " + percent);
         }
-        percent = 0;
-        while(percent < 0.99) {
-            ArrayList<Face> trainingFacesTemp = (ArrayList<Face>)trainingFaces.clone();
-            Collections.shuffle(trainingFacesTemp);
-            ArrayList<Face> trainingTestFaces = new ArrayList<Face>();
-            int size = (int)((double)trainingFacesTemp.size()/3);
-            for(int i = 0; i < size; i++) {
-                trainingTestFaces.add(trainingFacesTemp.get(0));
-                trainingFacesTemp.remove(0);
-            }
-            for (Face face : trainingFacesTemp) {
-                int correctAnswer = trainingAnswers.get(face.getImageNr());
-                mouthPerceptron.learn(face.getImage(), (correctAnswer - 1) % 2);
-            }
-            int numberOfCorrectAnswers = 0;
-            for(Face face : trainingTestFaces) {
-                int correctAnswer = trainingAnswers.get(face.getImageNr());
-                if (mouthPerceptron.answer(face.getImage()) == ((correctAnswer - 1) % 2)) {
-                    numberOfCorrectAnswers++;
-                }
-            }
-            percent = (double)numberOfCorrectAnswers / (double)trainingTestFaces.size();
-            //System.out.println("percentage : " + percent);
-        }
-
-        for(Face face : testFaces) {
-            System.out.println("Image" + face.getImageNr() + " " + getFacialExpression(eyebrowPerceptron.answer(face.getImage()), mouthPerceptron.answer(face.getImage())));
-        }
-    }
-
-    private static int getFacialExpression(int eyebrowExpression, int mouthExpression) {
-        return 1 + eyebrowExpression * 2 + mouthExpression;
+        return percent;
     }
 }
