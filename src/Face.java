@@ -23,4 +23,15 @@ public class Face implements Cloneable {
     public Face clone() {
         return new Face(image.clone(), imageNr);
     }
+
+    public String toString() {
+        String str = "";
+        for(int i = 0; i < 20; i++) {
+            for(int j = 0; j < 20; j++) {
+                str = str.concat(image[i][j] + " ");
+            }
+            str = str.concat("\n");
+        }
+        return str;
+    }
 }

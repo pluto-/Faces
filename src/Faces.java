@@ -59,19 +59,17 @@ public class Faces {
         Perceptron eyebrowPerceptron = getBestPerceptron(trainingFaces, trainingTestFaces, eyebrowAnswers);
         Perceptron mouthPerceptron = getBestPerceptron(trainingFaces, trainingTestFaces, mouthAnswers);*/
 
-        Perceptron eyebrowPerceptron = new Perceptron(20, 20, 0.001, 0.5);
-        Perceptron mouthPerceptron = new Perceptron(20, 20, 0.001, 0.5);
+        Perceptron eyebrowPerceptron = new Perceptron(20, 20, 0.1, 0.5);
+        Perceptron mouthPerceptron = new Perceptron(20, 20, 0.1, 0.5);
 
-        for(int i = 0; i < 1000; i++) {
-            train(eyebrowPerceptron, trainingFaces, eyebrowAnswers);
-        }
-        for(int i = 0; i < 1000; i++) {
-            train(mouthPerceptron, trainingFaces, mouthAnswers);
-        }
+        train(eyebrowPerceptron, trainingFaces, eyebrowAnswers);
+        train(mouthPerceptron, trainingFaces, mouthAnswers);
+
 
         for(Face face : testFaces) {
             int eyebrowAnswer = eyebrowPerceptron.answer(face.getImage());
             int mouthAnswer = mouthPerceptron.answer(face.getImage());
+
             if(eyebrowAnswer == SHAPE_MOUNTAIN && mouthAnswer == SHAPE_VALLEY) {
                 System.out.println("Image" + face.getImageNr() + " " + ANSWER_HAPPY);
             } else if(eyebrowAnswer == SHAPE_MOUNTAIN && mouthAnswer == SHAPE_MOUNTAIN) {
@@ -81,23 +79,42 @@ public class Faces {
             } else if(eyebrowAnswer == SHAPE_VALLEY && mouthAnswer == SHAPE_MOUNTAIN) {
                 System.out.println("Image" + face.getImageNr() + " " + ANSWER_MAD);
             }
+            //System.out.println("EYEBROW: " + eyebrowAnswer);
+            //System.out.println("MOUTH: " + eyebrowAnswer);
         }
 
     }
 
     private static void train(Perceptron perceptron, ArrayList<Face> trainingFaces_in, Map<Integer, Integer> trainingAnswers) {
-        ArrayList<Face> trainingFaces = (ArrayList<Face>)trainingFaces_in.clone();
-        Collections.shuffle(trainingFaces);
+        double correctPercent = 0;
+        while(correctPercent < 0.99) {
+            ArrayList<Face> trainingFaces = (ArrayList<Face>)trainingFaces_in.clone();
+            ArrayList<Face> trainingTestFaces = new ArrayList<Face>();
+            Collections.shuffle(trainingFaces);
+            int size = (int)((double)trainingFaces.size()/3);
+            for(int i = 0; i < size; i++) {
+                trainingTestFaces.add(trainingFaces.get(0));
+                trainingFaces.remove(0);
+            }
 
-        /*ArrayList<Face> trainingTestFaces = new ArrayList<Face>();
-        int size = (int)(trainingFaces.size() * 0.33);
-        for(int i = 0; i < size; i++) {
-            trainingTestFaces.add(trainingFaces.get(i));
-        }*/
+            for(Face face : trainingFaces) {
+                perceptron.learn(face.getImage(), trainingAnswers.get(face.getImageNr()).byteValue());
+            }
 
-        for(Face face : trainingFaces) {
-            perceptron.learn(face.getImage(), trainingAnswers.get(face.getImageNr()).byteValue());
+            int correctAnswers = 0;
+            int wrongAnswers = 0;
+            for(Face face : trainingTestFaces) {
+                int answer = perceptron.answer(face.getImage());
+                if(answer == trainingAnswers.get(face.getImageNr())) {
+                    correctAnswers++;
+                } else {
+                    wrongAnswers++;
+                }
+            }
+            correctPercent = (double)correctAnswers / (double)(correctAnswers + wrongAnswers);
+            System.out.println("Percent" + correctPercent);
         }
+
     }
 
     private static Perceptron getBestPerceptron(ArrayList<Face> trainingFaces, ArrayList<Face> trainingTestFaces, Map<Integer, Integer> trainingAnswers) {

@@ -75,6 +75,11 @@ public class Perceptron {
         return activation(sum);
     }
 
+    public String testMethod(double[][] inputs) {
+        String str = "";
+        return str;
+    }
+
     public static void main(String args[]) {
         ArrayList<Face> trainingFaces = null;
         ArrayList<Face> testFaces = null;
@@ -138,6 +143,17 @@ public class Perceptron {
         }
 
         System.out.println("Percent correct answers: " + 100*((double)correctAnswers/((double)correctAnswers+(double)wrongAnswers)));
+    }
+
+    public String toString() {
+        String str = "";
+        for(int i = 0; i < 20; i++) {
+            for(int j = 0; j < 20; j++) {
+                str = str.concat(weights[i][j] + " ");
+            }
+            str = str.concat("\n");
+        }
+        return str;
     }
 
 }
