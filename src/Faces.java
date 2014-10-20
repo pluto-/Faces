@@ -1,3 +1,5 @@
+import com.sun.org.apache.bcel.internal.generic.NEW;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -29,30 +31,61 @@ public class Faces {
             System.out.println("Could not load files. ERROR: " + e.getMessage());
         }
 
-        Perceptron eyebrowPerceptron = new Perceptron(20, 20, 0.1, 0.9);
-        Perceptron mouthPerceptron = new Perceptron(20, 20, 0.1, 0.7);
+        Perceptron eyebrowPerceptron = new Perceptron(20, 20, 0.1, 0.5);
+        Perceptron mouthPerceptron = new Perceptron(20, 20, 0.1, 0.5);
+
+
 
         double percent = 0;
-
         while(percent < 0.99) {
-            Collections.shuffle(trainingFaces, new Random(System.nanoTime()));
-            int numberOfCorrectAnswers = 0;
-            for (Face face : trainingFaces) {
+            ArrayList<Face> trainingFacesTemp = (ArrayList<Face>)trainingFaces.clone();
+            Collections.shuffle(trainingFacesTemp);
+            ArrayList<Face> trainingTestFaces = new ArrayList<Face>();
+            int size = (int)((double)trainingFacesTemp.size()/3);
+            for(int i = 0; i < size; i++) {
+                trainingTestFaces.add(trainingFacesTemp.get(0));
+                trainingFacesTemp.remove(0);
+            }
+            for (Face face : trainingFacesTemp) {
                 int correctAnswer = trainingAnswers.get(face.getImageNr());
-                double[][] image = face.getImage();
-                eyebrowPerceptron.learn(image, (correctAnswer - 1) / 2);
-                mouthPerceptron.learn(image, (correctAnswer - 1) % 2);
-                if (getFacialExpression(eyebrowPerceptron.answer(image), mouthPerceptron.answer(image)) == trainingAnswers.get(face.getImageNr())) {
+                eyebrowPerceptron.learn(face.getImage(), (correctAnswer - 1) / 2);
+            }
+            int numberOfCorrectAnswers = 0;
+            for(Face face : trainingTestFaces) {
+                int correctAnswer = trainingAnswers.get(face.getImageNr());
+                if (eyebrowPerceptron.answer(face.getImage()) == ((correctAnswer - 1) / 2)) {
                     numberOfCorrectAnswers++;
                 }
             }
-            percent = (double)numberOfCorrectAnswers / (double)trainingFaces.size();
-            System.out.println("percentage : " + percent);
+            percent = (double)numberOfCorrectAnswers / (double)trainingTestFaces.size();
+            //System.out.println("percentage : " + percent);
+        }
+        percent = 0;
+        while(percent < 0.99) {
+            ArrayList<Face> trainingFacesTemp = (ArrayList<Face>)trainingFaces.clone();
+            Collections.shuffle(trainingFacesTemp);
+            ArrayList<Face> trainingTestFaces = new ArrayList<Face>();
+            int size = (int)((double)trainingFacesTemp.size()/3);
+            for(int i = 0; i < size; i++) {
+                trainingTestFaces.add(trainingFacesTemp.get(0));
+                trainingFacesTemp.remove(0);
+            }
+            for (Face face : trainingFacesTemp) {
+                int correctAnswer = trainingAnswers.get(face.getImageNr());
+                mouthPerceptron.learn(face.getImage(), (correctAnswer - 1) % 2);
+            }
+            int numberOfCorrectAnswers = 0;
+            for(Face face : trainingTestFaces) {
+                int correctAnswer = trainingAnswers.get(face.getImageNr());
+                if (mouthPerceptron.answer(face.getImage()) == ((correctAnswer - 1) % 2)) {
+                    numberOfCorrectAnswers++;
+                }
+            }
+            percent = (double)numberOfCorrectAnswers / (double)trainingTestFaces.size();
+            //System.out.println("percentage : " + percent);
         }
 
         for(Face face : testFaces) {
-            int eyebrowAnswer = eyebrowPerceptron.answer(face.getImage());
-            int mouthAnswer = mouthPerceptron.answer(face.getImage());
             System.out.println("Image" + face.getImageNr() + " " + getFacialExpression(eyebrowPerceptron.answer(face.getImage()), mouthPerceptron.answer(face.getImage())));
         }
     }
