@@ -1,7 +1,7 @@
 /**
  * Created by Jonas on 2014-10-16.
  */
-public class Face {
+public class Face implements Cloneable {
 
     private double[][] image;
     private int imageNr;
@@ -17,5 +17,10 @@ public class Face {
 
     public int getImageNr() {
         return imageNr;
+    }
+
+    @Override
+    public Face clone() {
+        return new Face(image.clone(), imageNr);
     }
 }

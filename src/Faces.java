@@ -3,14 +3,6 @@ import java.util.*;
 
 public class Faces {
 
-    public static final int SHAPE_VALLEY = 0;
-    public static final int SHAPE_MOUNTAIN = 1;
-
-    public static final int ANSWER_HAPPY = 1;
-    public static final int ANSWER_SAD = 2;
-    public static final int ANSWER_MISCHIEVOUS = 3;
-    public static final int ANSWER_MAD = 4;
-
     public static void main(String[] args) {
 
         if(args.length < 3) {
@@ -35,15 +27,14 @@ public class Faces {
         double percent = 0;
 
         while(percent < 0.99) {
-            long seed = System.nanoTime();
-            Collections.shuffle(trainingFaces, new Random(seed));
+            Collections.shuffle(trainingFaces, new Random(System.nanoTime()));
             int numberOfCorrectAnswers = 0;
             for (Face face : trainingFaces) {
                 int correctAnswer = trainingAnswers.get(face.getImageNr());
                 double[][] image = face.getImage();
                 eyebrowPerceptron.learn(image, (correctAnswer - 1) / 2);
                 mouthPerceptron.learn(image, (correctAnswer - 1) % 2);
-                if (1 + eyebrowPerceptron.answer(image) * 2 + (mouthPerceptron.answer(image)) == trainingAnswers.get(face.getImageNr())) {
+                if (getFacialExpression(eyebrowPerceptron.answer(image), mouthPerceptron.answer(image)) == trainingAnswers.get(face.getImageNr())) {
                     numberOfCorrectAnswers++;
                 }
             }
@@ -54,7 +45,11 @@ public class Faces {
         for(Face face : testFaces) {
             int eyebrowAnswer = eyebrowPerceptron.answer(face.getImage());
             int mouthAnswer = mouthPerceptron.answer(face.getImage());
-            System.out.println("Image" + face.getImageNr() + " " + (1 + eyebrowAnswer*2 + mouthAnswer ));
+            System.out.println("Image" + face.getImageNr() + " " + getFacialExpression(eyebrowPerceptron.answer(face.getImage()), mouthPerceptron.answer(face.getImage())));
         }
+    }
+
+    private static int getFacialExpression(int eyebrowExpression, int mouthExpression) {
+        return 1 + eyebrowExpression * 2 + mouthExpression;
     }
 }
