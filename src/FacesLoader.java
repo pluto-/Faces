@@ -20,15 +20,15 @@ public class FacesLoader {
             while (line != null) {
                 if(line.length() > "Image".length() && line.substring(0, "Image".length()).equals("Image")) {
                     int imageNr = Integer.valueOf(line.substring("Image".length()));
-                    byte[][] image = new byte[20][20];
+                    double[][] image = new double[20][20];
                     for(int i = 0; i < 20; i++) {
                         line = facesBufferedReader.readLine();
 
                         for(int j = 0; j < 20; j++) {
                             if(line.indexOf(' ') == -1) {
-                                image[i][j] = Byte.valueOf(line);
+                                image[i][j] = Double.valueOf(line) / 32;
                             } else {
-                                image[i][j] = Byte.valueOf(line.substring(0, line.indexOf(' ')));
+                                image[i][j] = Double.valueOf(line.substring(0, line.indexOf(' '))) / 32;
 
                             }
                             if(line.indexOf(' ') != -1) {

@@ -3,15 +3,15 @@
  */
 public class Face {
 
-    private byte[][] image;
+    private double[][] image;
     private int imageNr;
 
-    public Face(byte[][] image, int imageNr) {
+    public Face(double[][] image, int imageNr) {
         this.image = image;
         this.imageNr = imageNr;
     }
 
-    public byte[][] getImage() {
+    public double[][] getImage() {
         return image;
     }
 

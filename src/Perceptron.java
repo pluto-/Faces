@@ -30,7 +30,7 @@ public class Perceptron {
         }
     }
 
-    public void learn(byte[][] inputs, byte expected) {
+    public void learn(double[][] inputs, byte expected) {
 
         if(inputs.length != weights.length || inputs[0].length != weights[0].length) {
             System.err.println("In method learn: Weight array does not have same dimensions as input array.");
@@ -60,7 +60,7 @@ public class Perceptron {
 
     }
 
-    public int answer(byte[][] inputs) {
+    public int answer(double[][] inputs) {
         if(inputs.length != weights.length || inputs[0].length != weights[0].length) {
             System.err.println("In method learn: Weight array does not have same dimensions as input array.");
         }
