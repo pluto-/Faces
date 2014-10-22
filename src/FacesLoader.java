@@ -5,11 +5,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
+/** Contains methods for loading faces and answers from files.
+ *
  * Created by Jonas on 2014-10-16.
  */
 public class FacesLoader {
 
+    /**
+     * Loads a file containing faces and puts them in an ArrayList as Face-objects. Rows does not begin with: "Image"
+     * are skipped.
+     * @param facesPath path to the file containing the faces.
+     * @return List of all the faces read.
+     * @throws IOException
+     */
     public static ArrayList<Face> loadFaces(String facesPath) throws IOException {
         ArrayList<Face> faces = new ArrayList<>();
 
@@ -44,6 +52,13 @@ public class FacesLoader {
         return faces;
     }
 
+    /**
+     * Loads a file containing answers. The answers are put in a HashMap with the face number as key and the answer as
+     * value. Rows which does not begin with "Image" are skipped.
+     * @param answersPath path to the file containing the answers.
+     * @return HashMap with the face number as key and answer as value.
+     * @throws IOException
+     */
     public static Map<Integer, Integer> loadAnswers(String answersPath) throws IOException {
         Map<Integer, Integer> answers = new HashMap<>();
 

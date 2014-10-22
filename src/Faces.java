@@ -9,6 +9,11 @@ public class Faces {
     private static final double MOUTH_THRESHOLD = 0.5;
     private static final double PERCENT_LIMIT = 0.99;
 
+    /**
+     * Main method. Calls the load faces-methods, creates the perceptrons, uses the method getFacialExpression to train
+     * them individually and uses them to answer the test faces.
+     * @param args Must consist of the following arguments: [Training file] [Training answers] [Test file]
+     */
     public static void main(String[] args) {
 
         if(args.length < 3) {

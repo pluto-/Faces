@@ -1,4 +1,5 @@
-/**
+/** Data holding class. Contains data about a face.
+ *
  * Created by Jonas on 2014-10-16.
  */
 public class Face implements Cloneable {
