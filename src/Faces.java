@@ -47,6 +47,12 @@ public class Faces {
         }
     }
 
+    /**
+     * Calculates an facial expression value from an eyebrow value and a mouth value.
+     * @param eyebrowExpression eyebrow value, 0 for leaning outwards, 1 for leaning inwards.
+     * @param mouthExpression mouth value, 0 for happy, 1 for sad.
+     * @return facial expression value, 1: happy, 2: sad, 3: mischievous, 4: mad.
+     */
     private static int getFacialExpression(int eyebrowExpression, int mouthExpression) {
         return 1 + eyebrowExpression * 2 + mouthExpression;
     }
